@@ -78,7 +78,7 @@ select Sid, Serial#, machine, program
 from V$SESSION
 where machine like '%jms%'
 -- let us kill the sessions to see how the adapter behaves
-ALTER SYSTEM KILL SESSION '49,225' IMMEDIATE;
+ALTER SYSTEM KILL SESSION '10,15' IMMEDIATE;
 
 
 CALL DBMS_AQADM.STOP_QUEUE('SYS.SAMPLE_AQ');

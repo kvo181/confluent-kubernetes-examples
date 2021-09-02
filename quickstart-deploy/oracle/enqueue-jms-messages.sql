@@ -65,15 +65,15 @@ CALL DBMS_AQADM.START_QUEUE(
 
 /* We need to create a queue supported by JMS */
 CALL DBMS_AQADM.CREATE_QUEUE_TABLE(
-        'SYS.SOURCE_EXAMPLE_QT_JMS', 
+        'SYS.SOURCE1_QT_JMS', 
         'SYS.AQ$_JMS_TEXT_MESSAGE');
 
 CALL DBMS_AQADM.CREATE_QUEUE(
-        'SYS.SOURCE_EXAMPLE_JMS',
-        'SYS.SOURCE_EXAMPLE_QT_JMS');
+        'SYS.SOURCE1_JMS',
+        'SYS.SOURCE1_QT_JMS');
 
 CALL DBMS_AQADM.START_QUEUE(
-        'SYS.SOURCE_EXAMPLE_JMS');
+        'SYS.SOURCE1_JMS');
 
 
 DECLARE 
@@ -95,18 +95,14 @@ BEGIN
     msg_property := SYS.AQ$_JMS_USERPROPERTY('JMS_OracleDeliveryMode', 100, '2', NULL, 27);
     msg_proparray(1) := msg_property;
 
-    msg_hdr := SYS.AQ$_JMS_HEADER(msg_agent,'test-1','<USERNAME>',null,null,null,msg_proparray);
+    msg_hdr := SYS.AQ$_JMS_HEADER(msg_agent,'test-3','<USERNAME>',null,null,null,msg_proparray);
 
     message := sys.aq$_jms_text_message(msg_hdr,null,null,null); 
 
-    -- FOR i IN 1..400 LOOP 
-    --     text := CONCAT (text, '1234567890'); 
-    -- END LOOP; 
-
-    message.text_vc := '{ "id": "id-2", "amount": 1234.5, "reason": "test" }';
+    message.text_vc := '{ "id": "id-3", "amount": 1234.5, "reason": "test" }';
     message.text_len := length(message.text_vc);
 
-    dbms_aq.enqueue(queue_name => 'SYS.SOURCE_JMS', 
+    dbms_aq.enqueue(queue_name => 'SYS.SOURCE1_JMS', 
                        enqueue_options => enqueue_options, 
                        message_properties => message_properties, 
                        payload => message, 
@@ -170,6 +166,6 @@ BEGIN
 END;
 
 
-SELECT qtb.USER_DATA.header.type as type_value, qtb.USER_DATA.text_vc as text_value  from SYS.SOURCE_QT_JMS qtb;
+SELECT qtb.USER_DATA.header.type as type_value, qtb.USER_DATA.text_vc as text_value  from SYS.SOURCE1_QT_JMS qtb;
 SELECT qtb.USER_DATA.text_vc as text_value  from SYS.SAMPLE_AQTBL qtb;
 SELECT qtb.USER_DATA.header.type as type_value, qtb.USER_DATA.text_vc as text_value  from SYS.SINK_QT_JMS qtb;

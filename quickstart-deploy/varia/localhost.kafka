@@ -10,17 +10,17 @@ value-format: string
 
 ###
 CONSUMER my-schema-group
-topic: payment-with-schema
-from: 2
+topic: payments-results_DLQ
+from: earliest
 ###
 
 CONSUMER example-group
-topic: sample
+topic: payments
 from: earliest
 ###
 
 PRODUCER keyed-message
-topic: test1
+topic: payments-results
 key: mykeyq
 {{random.words}}
 
