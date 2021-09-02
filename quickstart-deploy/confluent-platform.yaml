@@ -5,7 +5,7 @@ metadata:
   name: zookeeper
   namespace: confluent
 spec:
-  replicas: 3
+  replicas: 1
   image:
     application: confluentinc/cp-zookeeper-operator:6.1.0.0
     init: confluentinc/cp-init-container-operator:6.1.0.0
@@ -18,13 +18,24 @@ metadata:
   name: kafka
   namespace: confluent
 spec:
-  replicas: 3
+  replicas: 1
   image:
     application: confluentinc/cp-server-operator:6.1.0.0
     init: confluentinc/cp-init-container-operator:6.1.0.0
   dataVolumeCapacity: 10Gi
   metricReporter:
     enabled: true
+  configOverrides:
+    server:
+      - confluent.balancer.enable=false
+      - confluent.metrics.reporter.topic.replicas=1
+      - confluent.schema.registry.url=http://schemaregistry.confluent.svc.cluster.local:8081
+  # listeners:
+  #     external:
+  #       externalAccess:
+  #         type: loadBalancer
+  #         loadBalancer:
+  #           domain: confluent.local
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: Connect
@@ -34,12 +45,21 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-server-connect-operator:6.1.0.0
+#    application: confluentinc/cp-server-connect-operator:6.1.0.0
+    application: my-kafka-connect-image:1.1.0
     init: confluentinc/cp-init-container-operator:6.1.0.0
   dependencies:
     kafka:
       bootstrapEndpoint: kafka:9071
-
+  configOverrides:
+    server:
+      - config.storage.replication.factor=1
+      - offset.storage.replication.factor=1
+      - status.storage.replication.factor=1
+  # externalAccess:
+  #   type: loadBalancer
+  #   loadBalancer:
+  #     domain: confluent.local
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: KsqlDB
@@ -52,6 +72,19 @@ spec:
     application: confluentinc/cp-ksqldb-server-operator:6.1.0.0
     init: confluentinc/cp-init-container-operator:6.1.0.0
   dataVolumeCapacity: 10Gi
+  configOverrides:
+    server:
+      - bootstrap.servers=kafka.confluent.svc.cluster.local:9092
+      - ksql.schema.registry.url=http://schemaregistry.confluent.svc.cluster.local:8081
+      - ksql.connect.url=http://jms-adapter-cip-service.connectors.svc.cluster.local:8084
+      - ksql.heartbeat.enable=true
+      - ksql.sink.replicas=1
+      - ksql.streams.replication.factor=1
+      - ksql.internal.topic.replicas=1
+  # externalAccess:
+  #   type: loadBalancer
+  #   loadBalancer:
+  #     domain: confluent.local
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: ControlCenter
@@ -73,6 +106,21 @@ spec:
     connect:
     - name: connect
       url: http://connect.confluent.svc.cluster.local:8083
+    - name: connectors
+      url: http://jms-adapter-cip-service.connectors.svc.cluster.local:8084
+    - name: samples
+      url: http://redi-jms-connectors.sdms-redi-dev.svc.cluster.local:8085
+  configOverrides:
+    server:
+      - confluent.controlcenter.internal.topics.replication=1
+      - confluent.metrics.topic.replication=1
+      - confluent.metrics.topic.partitions=1
+      - confluent.monitoring.interceptor.topic.replication=1
+      - confluent.controlcenter.command.topic.replication=1
+  # externalAccess:
+  #   type: loadBalancer
+  #   loadBalancer:
+  #     domain: confluent.local
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: SchemaRegistry
@@ -84,3 +132,7 @@ spec:
   image:
     application: confluentinc/cp-schema-registry-operator:6.1.0.0
     init: confluentinc/cp-init-container-operator:6.1.0.0
+  # externalAccess:
+  #   type: loadBalancer
+  #   loadBalancer:
+  #     domain: confluent.local

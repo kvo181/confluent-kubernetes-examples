@@ -1,0 +1,199 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: connectors
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jms-adapter-782h6b884c
+  namespace: connectors
+type: Opaque
+stringData:
+  CONNECTOR_CONNECT_BOOTSTRAP_SERVERS: kafka.confluent.svc.cluster.local:9071
+  CONNECTOR_CONNECT_GROUP_ID: jms-adapter
+  CONNECTOR_CONNECT_CONFIG_STORAGE_TOPIC: jms-adapter-config
+  CONNECTOR_CONNECT_OFFSET_STORAGE_TOPIC: jms-adapter-offset
+  CONNECTOR_CONNECT_STATUS_STORAGE_TOPIC: jms-adapter-status
+  CONNECTOR_CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+  CONNECTOR_CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+  CONNECTOR_CONNECT_REST_ADVERTISED_HOST_NAME: my-jms-adapter
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jms-adapter-cip-service
+  namespace: connectors
+spec:
+  type: ClusterIP
+  selector:
+    app: jms-adapter
+  ports:
+  - protocol: TCP
+    port: 8084
+    targetPort: 8084
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jms-adapter-np-service
+  namespace: connectors
+spec:
+  type: NodePort
+  selector:
+    app: jms-adapter
+  ports:
+  - protocol: TCP
+    port: 8084
+    targetPort: 8084
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jms-adapter
+  name: jms-adapter-lb-service
+  namespace: connectors
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8084
+    targetPort: 8084
+    name: http
+  - port: 1234
+    targetPort: 1234
+    name: jmx
+  selector:
+    app: jms-adapter
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: jms-adapter
+  name: jms-adapter
+  namespace: connectors
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jms-adapter
+  template:
+    metadata:
+      labels:
+        app: jms-adapter
+    spec:
+      containers:
+      - env:
+        - name: CONNECT_BOOTSTRAP_SERVERS
+          valueFrom:
+            secretKeyRef:
+              key: CONNECTOR_CONNECT_BOOTSTRAP_SERVERS
+              name: jms-adapter-782h6b884c
+        - name: CONNECT_GROUP_ID
+          valueFrom:
+            secretKeyRef:
+              key: CONNECTOR_CONNECT_GROUP_ID
+              name: jms-adapter-782h6b884c
+        - name: CONNECT_CONFIG_STORAGE_TOPIC
+          valueFrom:
+            secretKeyRef:
+              key: CONNECTOR_CONNECT_CONFIG_STORAGE_TOPIC
+              name: jms-adapter-782h6b884c
+        - name: CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR
+          value: "-1"
+        - name: CONNECT_OFFSET_STORAGE_TOPIC
+          valueFrom:
+            secretKeyRef:
+              key: CONNECTOR_CONNECT_OFFSET_STORAGE_TOPIC
+              name: jms-adapter-782h6b884c
+        - name: CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR
+          value: "-1"
+        - name: CONNECT_STATUS_STORAGE_TOPIC
+          valueFrom:
+            secretKeyRef:
+              key: CONNECTOR_CONNECT_STATUS_STORAGE_TOPIC
+              name: jms-adapter-782h6b884c
+        - name: CONNECT_STATUS_STORAGE_REPLICATION_FACTOR
+          value: "-1"
+        - name: CONNECT_KEY_CONVERTER
+          valueFrom:
+            secretKeyRef:
+              key: CONNECTOR_CONNECT_KEY_CONVERTER
+              name: jms-adapter-782h6b884c
+        - name: CONNECT_VALUE_CONVERTER
+          valueFrom:
+            secretKeyRef:
+              key: CONNECTOR_CONNECT_VALUE_CONVERTER
+              name: jms-adapter-782h6b884c
+        - name: CONNECT_REST_ADVERTISED_HOST_NAME
+          valueFrom:
+            secretKeyRef:
+              key: CONNECTOR_CONNECT_REST_ADVERTISED_HOST_NAME
+              name: jms-adapter-782h6b884c
+        - name: CONNECT_REST_PORT
+          value: "8084"
+        # - name: CONNECTOR_JMS_CONFLUENT_LICENSE
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: CONNECTOR_JMS_CONFLUENT_LICENSE
+        #       name: of-migration-jms-adapter-782h6b884c
+        # - name: CONNECTOR_JMS_DESTINATION_NAME
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: CONNECTOR_JMS_DESTINATION_NAME
+        #       name: of-migration-jms-adapter-782h6b884c
+        # - name: CONNECTOR_JMS_JAVA_NAMING_PROVIDER_URL
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: CONNECTOR_JMS_JAVA_NAMING_PROVIDER_URL
+        #       name: of-migration-jms-adapter-782h6b884c
+        # - name: CONNECTOR_JMS_JAVA_NAMING_SECURITY_CREDENTIALS
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: CONNECTOR_JMS_JAVA_NAMING_SECURITY_CREDENTIALS
+        #       name: of-migration-jms-adapter-782h6b884c
+        # - name: CONNECTOR_JMS_JAVA_NAMING_SECURITY_PRINCIPAL
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: CONNECTOR_JMS_JAVA_NAMING_SECURITY_PRINCIPAL
+        #       name: of-migration-jms-adapter-782h6b884c
+        # - name: CONNECTOR_JMS_KAFKA_TOPIC
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: CONNECTOR_JMS_KAFKA_TOPIC
+        #       name: of-migration-jms-adapter-782h6b884c
+        # - name: CONNECTOR_JMS_NAME
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: CONNECTOR_JMS_NAME
+        #       name: of-migration-jms-adapter-782h6b884c
+        # - name: CONNECT_METRIC_REPORTERS
+        #   value: "io.confluent.metrics.reporter.ConfluentMetricsReporter"
+        # - name: CONNECT_CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: CONNECTOR_CONNECT_BOOTSTRAP_SERVERS
+        #       name: jms-adapter-782h6b884c
+        # - name: KAFKA_JMX_PORT
+        #   value: "33335"
+        - name: KAFKA_OPTS
+          value: "-javaagent:/usr/share/applicationinsights/lib/applicationinsights-agent-3.1.1.jar"
+        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+          value: "InstrumentationKey=d7dce6db-a7bc-4f5a-adaa-78f67ba00891;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/"
+        # - name: APPLICATIONINSIGHTS_CONFIGURATION_FILE
+        #   value: "../resources/applicationinsights-$(namespace).json"
+        envFrom:
+        - secretRef:
+            name: jms-adapter-782h6b884c
+        image: my-kafka-connect-base-image:1.4.0
+        name: jms-adapter
+        ports:
+        - containerPort: 8084
+        resources:
+          limits:
+            cpu: 1
+            memory: 4Gi
+          requests:
+            cpu: 500m
+            memory: 2Gi

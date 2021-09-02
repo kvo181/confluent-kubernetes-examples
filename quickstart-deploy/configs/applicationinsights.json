@@ -1,0 +1,101 @@
+{
+    "role": {
+        "name": "jms-connectors"
+    },
+    "sampling": {
+        "percentage": 100
+    },
+    "jmxMetrics": [
+        {
+            "name": "Connector Count",
+            "objectName": "kafka.connect:type=connect-worker-metrics",
+            "attribute": "connector-count"
+        },
+        {
+            "name": "Task Count",
+            "objectName": "kafka.connect:type=connect-worker-metrics",
+            "attribute": "task-count"
+        },
+        {
+            "name": "Connector Success",
+            "objectName": "kafka.connect:type=connect-worker-metrics",
+            "attribute": "connector-startup-success-total"
+        },
+        {
+            "name": "Connector Failure",
+            "objectName": "kafka.connect:type=connect-worker-metrics",
+            "attribute": "connector-startup-failure-total"
+        },
+        {
+            "name": "Task Success",
+            "objectName": "kafka.connect:type=connect-worker-metrics",
+            "attribute": "task-startup-success-total"
+        },
+        {
+            "name": "Task Failure",
+            "objectName": "kafka.connect:type=connect-worker-metrics",
+            "attribute": "task-startup-failure-total"
+        },
+        {
+            "name": "Task Running Ratio (jms-source-connector)",
+            "objectName": "kafka.connect:type=connector-task-metrics,connector=jms-source-connector,task=0",
+            "attribute": "running-ratio"
+        },
+        {
+            "name": "Task Record Total (jms-source-connector)",
+            "objectName": "kafka.connect:type=source-task-metrics,connector=jms-source-connector,task=0",
+            "attribute": "source-record-write-total"
+        },
+        {
+            "name": "Task Running Ratio (jms-sink-connector)",
+            "objectName": "kafka.connect:type=connector-task-metrics,connector=jms-sink-connector,task=0",
+            "attribute": "running-ratio"
+        },
+        {
+            "name": "Task Record Total (jms-sink-connector)",
+            "objectName": "kafka.connect:type=sink-task-metrics,connector=jms-sink-connector,task=0",
+            "attribute": "sink-record-read-total"
+        }
+    ],
+    "instrumentation": {
+        "logging": {
+            "level": "WARN"
+        },
+        "cassandra": {
+            "enabled": false
+        },
+        "jdbc": {
+            "enabled": false
+        },
+        "jms": {
+            "enabled": true
+        },
+        "kafka": {
+            "enabled": true
+        },
+        "micrometer": {
+            "enabled": false
+        },
+        "mongo": {
+            "enabled": true
+        },
+        "redis": {
+            "enabled": false
+        },
+        "springScheduling": {
+            "enabled": false
+        }
+    },
+    "preview": {
+        "metricIntervalSeconds": 300
+    },
+    "selfDiagnostics": {
+        "destination": "file+console",
+        "level": "INFO",
+        "file": {
+            "path": "/var/tmp/applicationinsights.log",
+            "maxSizeMb": 5,
+            "maxHistory": 1
+        }
+    }
+}

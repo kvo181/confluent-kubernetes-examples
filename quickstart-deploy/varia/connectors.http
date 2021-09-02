@@ -1,0 +1,565 @@
+# The version of the Connect worker that serves the REST request
+# The Git commit ID of the source code
+# The Kafka cluster ID that the worker is connected to
+GET http://localhost:8084
+###
+# Connectors
+# https://docs.confluent.io/platform/current/connect/references/restapi.html#connectors
+# Get a list of active connectors.
+GET http://localhost:8084/connectors
+###
+# Create a new connector, returning the current connector info if successful. 
+# Return 409 (Conflict) if rebalance is in process, or if the connector already exists.
+POST http://localhost:8084/connectors
+Content-Type: application/json
+Accept: application/json
+
+{
+   "name": "jms-source-example-connector",
+   "config": {
+    "name": "jms-source-example-connector",
+    "connector.class": "io.confluent.connect.jms.JmsSourceConnector",
+    "tasks.max": 1,
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "errors.retry.timeout": 0,
+    "errors.retry.delay.max.ms": 60000,
+    "errors.tolerance": "none",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "java.naming.provider.url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE",
+    "java.naming.factory.initial": "oracle.jms.AQjmsInitialContextFactory",
+    "connection.factory.name": "ConnectionFactory",
+    "java.naming.security.principal": "sys as sysdba",
+    "java.naming.security.credentials": "oracle",
+    "jms.destination.name": "SYS.SOURCE_EXAMPLE_JMS",
+    "jms.destination.type": "QUEUE",
+    "batch.size": 2,
+    "max.pending.messages": 4,
+    "max.poll.duration": 10000,
+    "max.retry.time": "0",
+    "kafka.topic": "sample",
+    "confluent.license": "",
+    "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+    "confluent.topic": "_confluent-command",
+    "confluent.topic.replication.factor": 1,
+    "db_url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE",
+    "plugin.path": "/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms/lib,/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms,/usr/share/confluent-hub-components",
+    "rest.port": "8085"
+   }
+ }
+###
+# Create a new connector, returning the current connector info if successful. 
+# Return 409 (Conflict) if rebalance is in process, or if the connector already exists.
+POST http://localhost:8084/connectors
+Content-Type: application/json
+Accept: application/json
+
+{
+   "name": "jms-source1-connector",
+   "config": {
+    "name": "jms-source1-connector",
+    "connector.class": "io.confluent.connect.jms.JmsSourceConnector",
+    "tasks.max": 1,
+    // "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    // "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    // "key.converter.schemas.enable": "false",
+    // "value.converter.schemas.enable": "false",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    //"key.converter.schema.registry.url": "http://schemaregistry.confluent.svc.cluster.local:8081",
+    // "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    // "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schemaregistry.confluent.svc.cluster.local:8081",
+    // "internal.key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    // "internal.value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    // "internal.value.converter": "io.confluent.connect.avro.AvroConverter",
+    // "internal.key.converter.schemas.enable": "false",
+    // "internal.value.converter.schemas.enable": "false",
+    // "internal.value.converter.schema.registry.url": "http://schemaregistry.confluent.svc.cluster.local:8081",
+    "transforms": "ReplaceField,ValueToKey,ExtractField,ExtractFieldk,fromJson",
+    "transforms.ValueToKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
+    "transforms.ReplaceField.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.ReplaceField.whitelist": "type,text",
+    "transforms.ValueToKey.fields": "type",
+    "transforms.ExtractField.type": "org.apache.kafka.connect.transforms.ExtractField$Value",
+    "transforms.ExtractField.field": "text",
+    "transforms.ExtractFieldk.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.ExtractFieldk.field": "type",
+    "transforms.fromJson.type" : "com.github.jcustenborder.kafka.connect.json.FromJson$Value",
+    "transforms.fromJson.json.schema.location" : "Inline",
+    "transforms.fromJson.json.schema.inline" : "{\"$id\":\"https://example.com/payment.schema.json\",\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"title\":\"io.confluent.examples.clients.basicavro.Payment\",\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"string\"},\"amount\":{\"type\":\"number\"}},\"required\":[\"id\",\"amount\"]}",
+    // "transforms.SetValueSchema.type": "org.apache.kafka.connect.transforms.SetSchemaMetadata$Value",
+    // "transforms.SetValueSchema.schema.name": "io.confluent.examples.clients.basicavro.Payment",
+    // "transforms.SetValueSchema.schema.version": 5,
+    "errors.retry.timeout": 0,
+    "errors.retry.delay.max.ms": 60000,
+    "errors.tolerance": "all",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "java.naming.provider.url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE",
+    "java.naming.factory.initial": "oracle.jms.AQjmsInitialContextFactory",
+    "connection.factory.name": "ConnectionFactory",
+    "java.naming.security.principal": "sys as sysdba",
+    "java.naming.security.credentials": "oracle",
+    "jms.destination.name": "SYS.SOURCE1_JMS",
+    "jms.destination.type": "QUEUE",
+    "batch.size": 2,
+    "max.pending.messages": 4,
+    "max.poll.duration": 10000,
+    "max.retry.time": "0",
+    //"kafka.topic": "test",
+    //"kafka.topic": "test-with-schema",
+    "kafka.topic": "payments-with-schema",
+    "confluent.license": "",
+    "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+    "confluent.topic": "_confluent-command",
+    "confluent.topic.replication.factor": 1,
+    "db_url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE",
+    "plugin.path": "/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms/lib,/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms,/usr/share/confluent-hub-components",
+    "rest.port": "8084",
+    "topic.creation.default.partitions"        : 1,
+    "topic.creation.default.replication.factor": 1,
+    "topic.creation.default.cleanup.policy"    : "delete"
+   }
+ }
+###
+# Create a new connector, returning the current connector info if successful. 
+# Return 409 (Conflict) if rebalance is in process, or if the connector already exists.
+POST http://localhost:8084/connectors
+Content-Type: application/json
+Accept: application/json
+
+{
+   "name": "jms-sink1-connector",
+   "config": {
+    "name": "jms-sink1-connector",
+    "connector.class": "io.confluent.connect.jms.JmsSinkConnector",
+    "tasks.max": 1,
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schemaregistry.confluent.svc.cluster.local:8081",
+    "errors.retry.timeout": 0,
+    "errors.retry.delay.max.ms": 60000,
+    "errors.tolerance": "none",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "topics": "payments-with-schema",
+    "errors.deadletterqueue.topic.name": "test1_DLQ",
+    "errors.deadletterqueue.topic.replication.factor": "1",
+    "errors.deadletterqueue.context.headers.enable": "true",
+    "java.naming.provider.url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE",
+    "java.naming.factory.initial": "oracle.jms.AQjmsInitialContextFactory",
+    "connection.factory.name": "ConnectionFactory",
+    "java.naming.security.principal": "sys as sysdba",
+    "java.naming.security.credentials": "oracle",
+    "jms.destination.name": "SYS.SOURCE1_JMS",
+    "jms.destination.type": "queue",
+    "confluent.license": "",
+    "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+    "confluent.topic": "_confluent-command",
+    "confluent.topic.replication.factor": 1,
+    "db_url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE"
+   }
+ }
+###
+# Get information about the connector.
+GET http://localhost:8084/connectors/jms-source-connector
+###
+# Get the configuration for the connector.
+GET http://localhost:8084/connectors/jms-source-connector/config
+###
+GET http://localhost:8084/connectors/jms-sink-connector/config
+###
+# Update the configuration
+# jms source using avro
+PUT http://localhost:8084/connectors/jms-source-connector/config
+Content-Type: application/json
+
+{
+    "name": "jms-source1-connector",
+    "connector.class": "io.confluent.connect.jms.JmsSourceConnector",
+    "tasks.max": 1,
+    // "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    // "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    // "key.converter.schemas.enable": "false",
+    // "value.converter.schemas.enable": "false",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    //"key.converter.schema.registry.url": "http://schemaregistry.confluent.svc.cluster.local:8081",
+    // "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    // "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schemaregistry.confluent.svc.cluster.local:8081",
+    // "internal.key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    // "internal.value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    // "internal.value.converter": "io.confluent.connect.avro.AvroConverter",
+    // "internal.key.converter.schemas.enable": "false",
+    // "internal.value.converter.schemas.enable": "false",
+    // "internal.value.converter.schema.registry.url": "http://schemaregistry.confluent.svc.cluster.local:8081",
+    "transforms": "ReplaceField,ValueToKey,ExtractField,ExtractFieldk,fromJson",
+    "transforms.ValueToKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
+    "transforms.ReplaceField.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.ReplaceField.whitelist": "type,text",
+    "transforms.ValueToKey.fields": "type",
+    "transforms.ExtractField.type": "org.apache.kafka.connect.transforms.ExtractField$Value",
+    "transforms.ExtractField.field": "text",
+    "transforms.ExtractFieldk.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.ExtractFieldk.field": "type",
+    "transforms.fromJson.type" : "com.github.jcustenborder.kafka.connect.json.FromJson$Value",
+    "transforms.fromJson.json.schema.location" : "Inline",
+    "transforms.fromJson.json.schema.inline" : "{\"$id\":\"https://example.com/payment.schema.json\",\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"title\":\"io.confluent.examples.clients.basicavro.Payment\",\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"string\"},\"amount\":{\"type\":\"number\"}},\"required\":[\"id\",\"amount\"]}",
+    // "transforms.SetValueSchema.type": "org.apache.kafka.connect.transforms.SetSchemaMetadata$Value",
+    // "transforms.SetValueSchema.schema.name": "io.confluent.examples.clients.basicavro.Payment",
+    // "transforms.SetValueSchema.schema.version": 5,
+    "errors.retry.timeout": 0,
+    "errors.retry.delay.max.ms": 60000,
+    "errors.tolerance": "all",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "java.naming.provider.url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE",
+    "java.naming.factory.initial": "oracle.jms.AQjmsInitialContextFactory",
+    "connection.factory.name": "ConnectionFactory",
+    "java.naming.security.principal": "sys as sysdba",
+    "java.naming.security.credentials": "oracle",
+    "jms.destination.name": "SYS.SOURCE1_JMS",
+    "jms.destination.type": "QUEUE",
+    "batch.size": 2,
+    "max.pending.messages": 4,
+    "max.poll.duration": 10000,
+    "max.retry.time": "0",
+    //"kafka.topic": "test",
+    //"kafka.topic": "test-with-schema",
+    "kafka.topic": "payments-with-schema",
+    "confluent.license": "",
+    "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+    "confluent.topic": "_confluent-command",
+    "confluent.topic.replication.factor": 1,
+    "db_url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE",
+    "plugin.path": "/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms/lib,/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms,/usr/share/confluent-hub-components",
+    "rest.port": "8084",
+    "topic.creation.default.partitions"        : 1,
+    "topic.creation.default.replication.factor": 1,
+    "topic.creation.default.cleanup.policy"    : "delete"
+}
+###
+# jms source compliant with BOOST without schema
+PUT http://localhost:8084/connectors/jms-source-connector/config
+Content-Type: application/json
+
+{
+    "name": "jms-source-connector",
+    "connector.class": "io.confluent.connect.jms.JmsSourceConnector",
+    "tasks.max": 1,
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "transforms": "ReplaceField,ValueToKey,ExtractFieldValue,ExtractFieldKey",
+    "transforms.ReplaceField.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.ReplaceField.whitelist": "type,text",
+    "transforms.ValueToKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
+    "transforms.ValueToKey.fields": "type",
+    "transforms.ExtractFieldValue.type": "org.apache.kafka.connect.transforms.ExtractField$Value",
+    "transforms.ExtractFieldValue.field": "text",
+    "transforms.ExtractFieldKey.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.ExtractFieldKey.field": "type",
+    "errors.retry.timeout": 0,
+    "errors.retry.delay.max.ms": 60000,
+    "errors.tolerance": "none",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "java.naming.provider.url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE",
+    "java.naming.factory.initial": "oracle.jms.AQjmsInitialContextFactory",
+    "connection.factory.name": "ConnectionFactory",
+    "java.naming.security.principal": "sys as sysdba",
+    "java.naming.security.credentials": "oracle",
+    "jms.destination.name": "SYS.SOURCE_JMS",
+    "jms.destination.type": "QUEUE",
+    "batch.size": 2,
+    "max.pending.messages": 4,
+    "max.poll.duration": 10000,
+    "max.retry.time": "0",
+    "kafka.topic": "payments",
+    "confluent.license": "",
+    "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+    "confluent.topic": "_confluent-command",
+    "confluent.topic.replication.factor": 1,
+    "db_url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE",
+    "plugin.path": "/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms/lib,/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms,/usr/share/confluent-hub-components",
+    "rest.port": "8084"
+}
+###
+# jms sink using avro
+PUT http://localhost:8084/connectors/jms-sink-connector/config
+Content-Type: application/json
+
+{
+    "name": "jms-sink-connector",
+    "connector.class": "io.confluent.connect.jms.JmsSinkConnector",
+    "tasks.max": 1,
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    //"value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schemaregistry.confluent.svc.cluster.local:8081",
+    "errors.retry.timeout": 0,
+    "errors.retry.delay.max.ms": 60000,
+    "errors.tolerance": "all",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "topics": "test1",
+    "errors.deadletterqueue.topic.name": "test1_DLQ",
+    "errors.deadletterqueue.topic.replication.factor": "1",
+    "errors.deadletterqueue.context.headers.enable": "true",
+    "java.naming.provider.url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE",
+    "java.naming.factory.initial": "oracle.jms.AQjmsInitialContextFactory",
+    "connection.factory.name": "ConnectionFactory",
+    "java.naming.security.principal": "sys as sysdba",
+    "java.naming.security.credentials": "oracle",
+    "jms.destination.name": "SYS.SINK_JMS",
+    "jms.destination.type": "queue",
+    "confluent.license": "",
+    "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+    "confluent.topic": "_confluent-command",
+    "confluent.topic.replication.factor": 1,
+    "db_url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE"
+}
+###
+# jms sink compliant with BOOST without schema
+PUT http://localhost:8084/connectors/jms-sink-connector/config
+Content-Type: application/json
+
+{
+    "name": "jms-sink-connector",
+    "connector.class": "io.confluent.connect.jms.JmsSinkConnector",
+    "tasks.max": 1,
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "errors.retry.timeout": 0,
+    "errors.retry.delay.max.ms": 60000,
+    "errors.tolerance": "all",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "topics": "payments-results",
+    "errors.deadletterqueue.topic.name": "payments-results_DLQ",
+    "errors.deadletterqueue.topic.replication.factor": "1",
+    "errors.deadletterqueue.context.headers.enable": "true",
+    "java.naming.provider.url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE",
+    "java.naming.factory.initial": "oracle.jms.AQjmsInitialContextFactory",
+    "connection.factory.name": "ConnectionFactory",
+    "java.naming.security.principal": "sys as sysdba",
+    "java.naming.security.credentials": "oracle",
+    "jms.destination.name": "SYS.SINK_JMS",
+    "jms.destination.type": "queue",
+    "confluent.license": "",
+    "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+    "confluent.topic": "_confluent-command",
+    "confluent.topic.replication.factor": 1,
+    "db_url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE"
+}
+###
+# Get current status of the connector, including whether it is running, failed or paused, which worker it is assigned to, error information if it has failed, and the state of all its tasks.
+GET http://localhost:8084/connectors/jms-source-connector/status
+###
+GET http://localhost:8084/connectors/jms-sink-connector/status
+###
+# Pause the connector and its tasks, which stops message processing until the connector is resumed. 
+# This call asynchronous and the tasks will not transition to PAUSED state at the same time.
+PUT http://localhost:8084/connectors/jms-source-connector/pause
+###
+# Resume a paused connector or do nothing if the connector is not paused. 
+# This call asynchronous and the tasks will not transition to RUNNING state at the same time.
+PUT http://localhost:8084/connectors/jms-source-connector/resume
+###
+# Tasks
+# Get a list of tasks currently running for the connector.
+GET http://localhost:8084/connectors/jms-source-connector/tasks
+###
+# Get a task’s status.
+GET http://localhost:8084/connectors/jms-source-connector/tasks/0/status
+###
+GET http://localhost:8084/connectors/jms-sink-connector/tasks/0/status
+###
+# Restart a task
+POST http://localhost:8084/connectors/jms-source-connector/tasks/0/restart
+###
+POST http://localhost:8084/connectors/jms-sink-connector/tasks/0/restart
+###
+# Topics
+# Returns a list of connector topic names. 
+# There is no defined order in which the topics are returned and consecutive calls may return the same topic names but in different order. 
+#This request is independent of whether a connector is running, and will return an empty set of topics, both for connectors that don’t have active topics as well as non-existent connectors.
+GET http://localhost:8084/connectors/jms-source-connector/topics
+###
+GET http://localhost:8084/connectors/jms-sink-connector/topics
+###
+# Connector Plugins
+# Return a list of connector plugins installed in the Kafka Connect cluster.
+GET http://localhost:8084/connector-plugins
+###
+# Validate the provided configuration values against the configuration definition. 
+# This API performs per config validation, returns suggested values and error messages during validation.
+PUT http://localhost:8084/connector-plugins/JmsSourceConnector/config/validate
+Content-Type: application/json
+
+{
+    "name": "jms-source-connector",
+    "connector.class": "io.confluent.connect.jms.JmsSourceConnector",
+    "tasks.max": 1,
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter.schema.registry.url": "http://schemaregistry.confluent.svc.cluster.local:8081",
+    "errors.retry.timeout": 0,
+    "errors.retry.delay.max.ms": 60000,
+    "errors.tolerance": "all",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "java.naming.provider.url": "jdbc:oracle:thin:@10.105.165.19:1521/XE",
+    "java.naming.factory.initial": "oracle.jms.AQjmsInitialContextFactory",
+    "connection.factory.name": "ConnectionFactory",
+    "java.naming.security.principal": "sys as sysdba",
+    "java.naming.security.credentials": "oracle",
+    "jms.destination.name": "SYS.SOURCE_JMS",
+    "jms.destination.type": "QUEUE",
+    "batch.size": 2,
+    "max.pending.messages": 4,
+    "max.poll.duration": 10000,
+    "max.retry.time": "0",
+    "kafka.topic": "test-with-schema",
+    "confluent.license": "",
+    "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+    "confluent.topic": "_confluent-command",
+    "confluent.topic.replication.factor": 1,
+    "db_url": "jdbc:oracle:thin:@10.105.165.19:1521/XE",
+    "plugin.path": "/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms/lib,/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms,/usr/share/confluent-hub-components",
+    "rest.port": "8084",
+    "topic.creation.default.partitions"        : 4,
+    "topic.creation.default.replication.factor": 1,
+    "topic.creation.default.cleanup.policy"    : "compact"
+}
+
+###
+PUT http://localhost:8084/connector-plugins/JmsSinkConnector/config/validate
+Content-Type: application/json
+
+{
+    "name": "jms-sink-connector",
+    "connector.class": "io.confluent.connect.jms.JmsSinkConnector",
+    "tasks.max": 1,
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "errors.retry.timeout": 0,
+    "errors.retry.delay.max.ms": 60000,
+    "errors.tolerance": "all",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "topics": "test1",
+    "errors.deadletterqueue.topic.name": "test1_DLQ",
+    "errors.deadletterqueue.topic.replication.factor": "3",
+    "errors.deadletterqueue.context.headers.enable": "true",
+    "java.naming.provider.url": "jdbc:oracle:thin:@10.105.165.19:1521/XE",
+    "java.naming.factory.initial": "oracle.jms.AQjmsInitialContextFactory",
+    "connection.factory.name": "ConnectionFactory",
+    "java.naming.security.principal": "sys as sysdba",
+    "java.naming.security.credentials": "oracle",
+    "jms.destination.name": "SYS.REPAR_NAME_QUEUE_JMS",
+    "jms.destination.type": "queue",
+    "confluent.license": "",
+    "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+    "confluent.topic": "_confluent-command",
+    "confluent.topic.replication.factor": 1,
+    "db_url": "jdbc:oracle:thin:@10.105.165.19:1521/XE"
+}
+###
+# ksqlDB 
+# https://docs.ksqldb.io/en/latest/developer-guide/api/
+# information about the status of a ksqlDB Server
+GET http://localhost:8088/info
+###
+# health of your ksqlDB server
+GET http://localhost:8088/healthcheck
+###
+# information about the status of all ksqlDB servers in a ksqlDB cluster
+# Enable this endpoint by setting ksql.heartbeat.enable to true.
+GET http://localhost:8088/clusterStatus
+###
+GET http://localhost:8088/status
+###
+# Check the validity of a property
+# (unclear how to specify the property)
+GET http://localhost:8088/is_valid_property/ksql.connect.url
+###
+# Execute a statement
+POST http://localhost:8088/ksql
+Accept: application/vnd.ksql.v1+json
+Content-Type: application/vnd.ksql.v1+json
+
+{
+  "ksql": "LIST TOPICS;",
+  "streamsProperties": {}
+}
+###
+POST http://localhost:8088/ksql
+Accept: application/vnd.ksql.v1+json
+Content-Type: application/vnd.ksql.v1+json
+
+{
+  "ksql": "LIST STREAMS;",
+  "streamsProperties": {}
+}
+###
+POST http://localhost:8088/ksql
+Accept: application/vnd.ksql.v1+json
+Content-Type: application/vnd.ksql.v1+json
+
+{
+  "ksql": "LIST QUERIES;",
+  "streamsProperties": {}
+}
+###
+POST http://localhost:8088/ksql
+Accept: application/vnd.ksql.v1+json
+Content-Type: application/vnd.ksql.v1+json
+
+{
+  "ksql": "CREATE STREAM test (v STRING) WITH (VALUE_FORMAT='KAFKA', KAFKA_TOPIC='test') ;",
+  "streamsProperties": {
+    "ksql.streams.auto.offset.reset": "earliest"
+  }
+}
+###
+POST http://localhost:8088/ksql
+Accept: application/vnd.ksql.v1+json
+Content-Type: application/vnd.ksql.v1+json
+
+{
+  "ksql": "DESCRIBE EXTENDED test;",
+  "streamsProperties": {}
+}
+###
+# Run a query
+POST http://localhost:8088/query
+Accept: application/vnd.ksql.v1+json
+Content-Type: application/vnd.ksql.v1+json
+
+{
+  "ksql": "SELECT * FROM test EMIT CHANGES;",
+  "streamsProperties": {
+      "auto.offset.reset": "earliest"
+  }
+}
+###
+POST http://localhost:8088/query
+Accept: application/vnd.ksql.v1+json
+Content-Type: application/vnd.ksql.v1+json
+
+{
+  "ksql": "PRINT 'test';",
+  "streamsProperties": {}
+}
+###
+GET http://localhost:8088/query-stream http2
+Accept: application/vnd.ksql.v1+json
+Content-Type: application/vnd.ksql.v1+json
+
+{
+    "sql":"SELECT MSG_CT FROM MSG_COUNT WHERE X='X';"
+}
+

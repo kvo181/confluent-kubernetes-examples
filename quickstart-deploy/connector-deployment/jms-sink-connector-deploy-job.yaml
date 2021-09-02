@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jms-sink-connector-deploy
+  namespace: connectors
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      volumes:
+      - name: jms-sink-connector
+        configMap:
+          name: jms-sink-connector
+      containers:
+      - name: jms-sink-connector-deploy
+        image: cnfldemos/alpine-curl:3.10.2_7.65.1
+        # args: [
+        #   "http://jms-adapter-cip-service:8084/connectors"
+        # ]
+        args: [ 
+          "-s",
+          "-X", "POST",
+          "-H", "Content-Type: application/json",
+          "--data", "@/etc/config/connector/connector.json",
+          "http://jms-adapter-cip-service:8084/connectors"
+        ]
+        volumeMounts:
+          - name: jms-sink-connector
+            mountPath: /etc/config/connector
+      restartPolicy: Never
+  backoffLimit: 1

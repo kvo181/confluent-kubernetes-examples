@@ -1,0 +1,30 @@
+CONSUMER my-schema-group
+topic: test
+from: earliest
+###
+
+CONSUMER my-avro-schema-group
+topic: transactions
+from: 0
+value-format: string
+
+###
+CONSUMER my-schema-group
+topic: payment-with-schema
+from: 2
+###
+
+CONSUMER example-group
+topic: sample
+from: earliest
+###
+
+PRODUCER keyed-message
+topic: test1
+key: mykeyq
+{{random.words}}
+
+###
+
+
+###

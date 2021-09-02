@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jms-source-connector
+  namespace: connectors
+data:
+  connector.json: '{
+   "name": "jms-source-connector",
+   "config": {
+    "name": "jms-source-connector",
+    "connector.class": "io.confluent.connect.jms.JmsSourceConnector",
+    "tasks.max": 1,
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schemaregistry.confluent.svc.cluster.local:8081",
+    "errors.retry.timeout": 0,
+    "errors.retry.delay.max.ms": 60000,
+    "errors.tolerance": "all",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "java.naming.provider.url": "jdbc:oracle:thin:@10.105.165.19:1521/XE",
+    "java.naming.factory.initial": "oracle.jms.AQjmsInitialContextFactory",
+    "connection.factory.name": "ConnectionFactory",
+    "java.naming.security.principal": "sys as sysdba",
+    "java.naming.security.credentials": "oracle",
+    "jms.destination.name": "SYS.REPAR_NAME_QUEUE_JMS",
+    "jms.destination.type": "QUEUE",
+    "batch.size": 2,
+    "max.pending.messages": 4,
+    "max.poll.duration": 10000,
+    "max.retry.time": "0",
+    "kafka.topic": "test",
+    "confluent.license": "",
+    "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+    "confluent.topic": "_confluent-command",
+    "confluent.topic.replication.factor": 3,
+    "db_url": "jdbc:oracle:thin:@10.105.165.19:1521/XE",
+    "plugin.path": "/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms/lib,/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms,/usr/share/confluent-hub-components",
+    "rest.port": "8084"
+   }
+ }'
