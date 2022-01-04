@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sdms-get-connectors
+  namespace: sdms-common-dev
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      containers:
+      - args:
+        - -s
+        - http://sdms-kafka-connectors:8085/connectors
+        image: cnfldemos/alpine-curl:3.10.2_7.65.1
+        imagePullPolicy: IfNotPresent
+        name: sdms-get-connectors
+      restartPolicy: Never
+  ttlSecondsAfterFinished: 6

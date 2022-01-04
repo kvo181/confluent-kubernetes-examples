@@ -30,12 +30,12 @@ spec:
       - confluent.balancer.enable=false
       - confluent.metrics.reporter.topic.replicas=1
       - confluent.schema.registry.url=http://schemaregistry.confluent.svc.cluster.local:8081
-  # listeners:
-  #     external:
-  #       externalAccess:
-  #         type: loadBalancer
-  #         loadBalancer:
-  #           domain: confluent.local
+  listeners:
+      external:
+        externalAccess:
+          type: loadBalancer
+          loadBalancer:
+            domain: confluent.local
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: Connect
@@ -107,9 +107,9 @@ spec:
     - name: connect
       url: http://connect.confluent.svc.cluster.local:8083
     - name: connectors
-      url: http://jms-adapter-cip-service.connectors.svc.cluster.local:8084
-    - name: samples
-      url: http://redi-jms-connectors.sdms-redi-dev.svc.cluster.local:8085
+      url: http://jms-adapter-service.connectors.svc.cluster.local:8084
+    # - name: samples
+    #   url: http://redi-jms-connectors.sdms-redi-dev.svc.cluster.local:8085
   configOverrides:
     server:
       - confluent.controlcenter.internal.topics.replication=1
@@ -117,10 +117,11 @@ spec:
       - confluent.metrics.topic.partitions=1
       - confluent.monitoring.interceptor.topic.replication=1
       - confluent.controlcenter.command.topic.replication=1
-  # externalAccess:
-  #   type: loadBalancer
-  #   loadBalancer:
-  #     domain: confluent.local
+  externalAccess:
+    type: loadBalancer
+    loadBalancer:
+      domain: confluent.local
+      port: 9021
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: SchemaRegistry

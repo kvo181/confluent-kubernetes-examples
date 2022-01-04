@@ -20,6 +20,140 @@ stringData:
   CONNECTOR_CONNECT_REST_ADVERTISED_HOST_NAME: my-jms-adapter
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-connect-jmx-config
+  namespace: connectors
+data: 
+  kafka-connect.yml: |
+    lowercaseOutputName: true
+    whitelistObjectNames:
+      - "kafka.connect:type=connector-metrics,*"
+      - "kafka.connect:type=connector-task-metrics,*"
+      - "kafka.connect:type=connect-worker-metrics"
+      - "kafka.connect:type=connect-worker-metrics,*"
+      - "kafka.connect:type=source-task-metrics,*"
+      - "kafka.connect:type=sink-task-metrics,*"
+      - "kafka.connect:type=task-error-metrics,*"
+    blacklistObjectNames: 
+      - "java.lang:*"
+    rules:
+      #kafka.connect:type=app-info,client-id="{clientid}"
+      #kafka.consumer:type=app-info,client-id="{clientid}"
+      #kafka.producer:type=app-info,client-id="{clientid}"
+      - pattern: kafka.(.+)<type=app-info, client-id=(.+)><>start-time-ms
+        name: kafka_$1_start_time_seconds
+        labels:
+          clientId: "$2"
+        help: "Kafka $1 JMX metric start time seconds"
+        type: GAUGE
+        valueFactor: 0.001 
+      - pattern: "kafka.(.+)<type=app-info, client-id=(.+)><>(commit-id|version): (.+)"
+        name: kafka_$1_$3_info
+        value: 1
+        labels:
+          clientId: "$2"
+          $3: "$4"
+        help: "Kafka $1 JMX metric info version and commit-id"
+        type: GAUGE
+
+      #kafka.producer:type=producer-topic-metrics,client-id="{clientid}",topic="{topic}"", partition="{partition}"
+      #kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{clientid}",topic="{topic}"", partition="{partition}"
+      - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.+), topic=(.+), partition=(.+)><>(.+-total|compression-rate|.+-avg|.+-replica|.+-lag|.+-lead)
+        name: kafka_$2_$6
+        labels:
+          clientId: "$3"
+          topic: "$4"
+          partition: "$5"
+        help: "Kafka $1 JMX metric type $2"
+        type: GAUGE
+
+      #kafka.producer:type=producer-topic-metrics,client-id="{clientid}",topic="{topic}"
+      #kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{clientid}",topic="{topic}"", partition="{partition}"
+      - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.+), topic=(.+)><>(.+-total|compression-rate|.+-avg)
+        name: kafka_$2_$5
+        labels:
+          clientId: "$3"
+          topic: "$4"
+        help: "Kafka $1 JMX metric type $2"
+        type: GAUGE
+
+      #kafka.connect:type=connect-node-metrics,client-id="{clientid}",node-id="{nodeid}"
+      #kafka.consumer:type=consumer-node-metrics,client-id=consumer-1,node-id="{nodeid}"
+      - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.+), node-id=(.+)><>(.+-total|.+-avg)
+        name: kafka_$2_$5
+        labels:
+          clientId: "$3"
+          nodeId: "$4"
+        help: "Kafka $1 JMX metric type $2"
+        type: UNTYPED
+
+      #kafka.connect:type=kafka-metrics-count,client-id="{clientid}"
+      #kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{clientid}"
+      #kafka.consumer:type=consumer-coordinator-metrics,client-id="{clientid}"
+      #kafka.consumer:type=consumer-metrics,client-id="{clientid}"
+      - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.*)><>(.+-total|.+-avg|.+-bytes|.+-count|.+-ratio|.+-age|.+-flight|.+-threads|.+-connectors|.+-tasks|.+-ago)
+        name: kafka_$2_$4
+        labels:
+          clientId: "$3"
+        help: "Kafka $1 JMX metric type $2"
+        type: GAUGE
+
+      # kafka.connect:type=connector-metrics,connector="{connector}"
+      - pattern: "kafka.connect<type=connector-metrics, connector=(.+)><>status: ([a-z-]+)"
+        name: kafka_connectors_status
+        value: 1
+        labels:
+          connector: $1
+          status: $2
+        help: "Kafka Connect JMX metric connectors status"
+        type: GAUGE
+
+      #kafka.connect:type=connector-task-metrics,connector="{connector}",task="{task}<> status"
+      - pattern: "kafka.connect<type=connector-task-metrics, connector=(.+), task=(.+)><>status: ([a-z-]+)"
+        name: kafka_connect_connector_status
+        value: 1
+        labels:
+          connector: "$1"
+          task: "$2"
+          status: "$3"
+        help: "Kafka Connect JMX Connector status"
+        type: GAUGE
+
+      #kafka.connect:type=task-error-metrics,connector="{connector}",task="{task}"
+      #kafka.connect:type=source-task-metrics,connector="{connector}",task="{task}"
+      #kafka.connect:type=sink-task-metrics,connector="{connector}",task="{task}"
+      #kafka.connect:type=connector-task-metrics,connector="{connector}",task="{task}"
+      - pattern: kafka.connect<type=(.+)-metrics, connector=(.+), task=(.+)><>(.+-total|.+-count|.+-ms|.+-ratio|.+-avg|.+-failures|.+-requests|.+-timestamp|.+-logged|.+-errors|.+-retries|.+-skipped)
+        name: kafka_connect_$1_$4
+        labels:
+          connector: "$2"
+          task: "$3"
+        help: "Kafka Connect JMX metric type $1"
+        type: GAUGE
+
+      #kafka.connect:type=connector-metrics,connector="{connector}"
+      #kafka.connect:type=connect-worker-metrics,connector="{connector}"
+      - pattern: kafka.connect<type=connect-worker-metrics, connector=(.+)><>([a-z-]+)
+        name: kafka_connect_worker_$2
+        labels:
+          connector: "$1"
+        help: "Kafka Connect JMX metric $1"
+        type: GAUGE
+
+      #kafka.connect:type=connect-worker-metrics
+      - pattern: kafka.connect<type=connect-worker-metrics><>([a-z-]+)
+        name: kafka_connect_worker_$1
+        help: "Kafka Connect JMX metric worker"
+        type: GAUGE
+
+      #kafka.connect:type=connect-worker-rebalance-metrics
+      - pattern: kafka.connect<type=connect-worker-rebalance-metrics><>([a-z-]+)
+        name: kafka_connect_worker_rebalance_$1
+        help: "Kafka Connect JMX metric rebalance information"
+        type: GAUGE
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: jms-adapter-cip-service
@@ -32,6 +166,11 @@ spec:
   - protocol: TCP
     port: 8084
     targetPort: 8084
+    name: rest-port
+  - protocol: TCP
+    port: 8093
+    targetPort: 8093
+    name: metrics-port
 ---
 apiVersion: v1
 kind: Service
@@ -59,10 +198,13 @@ spec:
   ports:
   - port: 8084
     targetPort: 8084
-    name: http
-  - port: 1234
-    targetPort: 1234
-    name: jmx
+    name: rest-port
+  - port: 8093
+    targetPort: 8093
+    name: metrics-port
+  # - port: 33335
+  #   targetPort: 33335
+  #   name: jmx
   selector:
     app: jms-adapter
 ---
@@ -131,8 +273,27 @@ spec:
             secretKeyRef:
               key: CONNECTOR_CONNECT_REST_ADVERTISED_HOST_NAME
               name: jms-adapter-782h6b884c
-        - name: CONNECT_REST_PORT
-          value: "8084"
+        # Since kafka 7.0.0 the below is deprecated. 
+        # See https://cwiki.apache.org/confluence/display/KAFKA/KIP-208%3A+Add+SSL+support+to+Kafka+Connect+REST+interface
+        # - name: CONNECT_REST_PORT
+        #   value: "8084"
+        # New since 7.0.0 to enable a port other than 8083
+        - name: CONNECT_LISTENERS
+          value: "http://:8084"
+        # Log4j
+        - name: CONNECT_LOG4J_ROOT_LOGLEVEL
+          value: "INFO"
+        - name: CONNECT_LOG4J_LOGGERS
+          value: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR,org.apache.kafka.connect.json.JsonConverterConfig=WARN,io.confluent.connect.cloud.storage.source.StorageSourceTask=WARN"
+        - name: KAFKA_OPTS
+          value: "-javaagent:/usr/share/prometheus/jmx_prometheus_javaagent-0.16.1.jar=8093:/usr/share/prometheus/config/kafka-connect.yml"
+        # - name: CONNECT_CONFLUENTmetrics.reporter.bootstrap.servers
+        # - name: CONNECT_METRIC_REPORTERS
+        #   value: "io.confluent.metrics.reporter.ConfluentMetricsReporter"
+        # - name: KAFKA_JMX_PORT
+        #   value: "1234"
+        # - name: KAFKA_JMX_HOSTNAME
+        #   value: localhost          
         # - name: CONNECTOR_JMS_CONFLUENT_LICENSE
         #   valueFrom:
         #     secretKeyRef:
@@ -168,8 +329,6 @@ spec:
         #     secretKeyRef:
         #       key: CONNECTOR_JMS_NAME
         #       name: of-migration-jms-adapter-782h6b884c
-        # - name: CONNECT_METRIC_REPORTERS
-        #   value: "io.confluent.metrics.reporter.ConfluentMetricsReporter"
         # - name: CONNECT_CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS
         #   valueFrom:
         #     secretKeyRef:
@@ -177,16 +336,17 @@ spec:
         #       name: jms-adapter-782h6b884c
         # - name: KAFKA_JMX_PORT
         #   value: "33335"
-        - name: KAFKA_OPTS
-          value: "-javaagent:/usr/share/applicationinsights/lib/applicationinsights-agent-3.1.1.jar"
-        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
-          value: "InstrumentationKey=d7dce6db-a7bc-4f5a-adaa-78f67ba00891;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/"
+        # - name: KAFKA_OPTS
+        #   value: "-javaagent:/usr/share/applicationinsights/lib/applicationinsights-agent-3.1.1.jar"
+        # - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+        #   value: "InstrumentationKey=d7dce6db-a7bc-4f5a-adaa-78f67ba00891;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/"
         # - name: APPLICATIONINSIGHTS_CONFIGURATION_FILE
         #   value: "../resources/applicationinsights-$(namespace).json"
         envFrom:
         - secretRef:
             name: jms-adapter-782h6b884c
-        image: my-kafka-connect-base-image:1.4.0
+        image: my-kafka-connect-base-image:1.6.4
+        # image: sabamsdms.azurecr.io/be.sabam.repartitions/sdms-kafka-connectors:0a58d4096aa026f5dbfb6d014acc0fe9c7ca71a7
         name: jms-adapter
         ports:
         - containerPort: 8084
@@ -197,3 +357,82 @@ spec:
           requests:
             cpu: 500m
             memory: 2Gi
+        volumeMounts:
+          - mountPath: /usr/share/prometheus/config
+            name: kafka-connect-jmx-config
+      volumes:
+        - name: kafka-connect-jmx-config
+          configMap:
+            name: kafka-connect-jmx-config
+# ---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: omsagent-secret
+# type: Opaque
+# data:
+#   WSID: 5e46ad54-1a38-44e6-b4f3-894ed0f074c6
+#   KEY: IuHfCQoqPpKov3M4GkSSfHedl4Mb/EBBSVuXvuJ1MmVJBTl/ATZtnI2Ka8UDJj3zlPmY4v0gR5ZHmawIuHvFUg==
+# ---
+# apiVersion: extensions/v1beta1
+# kind: DaemonSet
+# metadata:
+#  name: omsagent
+# spec:
+#  template:
+#   metadata:
+#    labels:
+#     app: omsagent
+#     agentVersion: 1.6.0-163
+#     dockerProviderVersion: 1.0.0-34
+#   spec:
+#    containers:
+#      - name: omsagent 
+#        image: "mcr.microsoft.com/azuremonitor/containerinsights/ciprod:microsoft-oms-latest"
+#        imagePullPolicy: Always
+#        securityContext:
+#          privileged: true
+#        ports:
+#        - containerPort: 25225
+#          protocol: TCP 
+#        - containerPort: 25224
+#          protocol: UDP
+#        volumeMounts:
+#         - mountPath: /var/run/docker.sock
+#           name: docker-sock
+#         - mountPath: /var/log 
+#           name: host-log
+#         - mountPath: /etc/omsagent-secret
+#           name: omsagent-secret
+#           readOnly: true
+#         - mountPath: /var/lib/docker/containers 
+#           name: containerlog-path  
+#        livenessProbe:
+#         exec:
+#          command:
+#          - /bin/bash
+#          - -c
+#          - ps -ef | grep omsagent | grep -v "grep"
+#         initialDelaySeconds: 60
+#         periodSeconds: 60
+#    nodeSelector:
+#     beta.kubernetes.io/os: linux    
+#    # Tolerate a NoSchedule taint on master that ACS Engine sets.
+#    tolerations:
+#     - key: "node-role.kubernetes.io/master"
+#       operator: "Equal"
+#       value: "true"
+#       effect: "NoSchedule"     
+#    volumes:
+#     - name: docker-sock 
+#       hostPath:
+#        path: /var/run/docker.sock
+#     - name: host-log
+#       hostPath:
+#        path: /var/log 
+#     - name: omsagent-secret
+#       secret:
+#        secretName: omsagent-secret
+#     - name: containerlog-path
+#       hostPath:
+#        path: /var/lib/docker/containers    

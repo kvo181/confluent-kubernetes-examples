@@ -1,7 +1,9 @@
 FROM confluentinc/cp-kafka-connect:latest
 RUN confluent-hub install --no-prompt confluentinc/kafka-connect-jms:latest \
    && confluent-hub install --no-prompt confluentinc/kafka-connect-jms-sink:latest \
-   && confluent-hub install --no-prompt jcustenborder/kafka-connect-json-schema:latest
+   && confluent-hub install --no-prompt jcustenborder/kafka-connect-json-schema:latest \
+   && confluent-hub install --no-prompt confluentinc/kafka-connect-azure-blob-storage:latest \
+   && confluent-hub install --no-prompt confluentinc/kafka-connect-azure-blob-storage-source:latest
 # client libraries for the source connector
 COPY ./libs/aqapi-19.3.0.0.jar /usr/share/confluent-hub-components/confluentinc-kafka-connect-jms/lib/aqapi-19.3.0.0.jar
 COPY ./libs/ojdbc8-12.2.0.1.jar /usr/share/confluent-hub-components/confluentinc-kafka-connect-jms/lib/ojdbc8-12.2.0.1.jar
@@ -16,3 +18,6 @@ COPY ./libs/jta-1.1.jar /usr/share/confluent-hub-components/confluentinc-kafka-c
 # Application Insights
 COPY ./libs/applicationinsights-agent-3.1.1.jar /usr/share/applicationinsights/lib/applicationinsights-agent-3.1.1.jar
 COPY ./configs/applicationinsights.json /usr/share/applicationinsights/lib/applicationinsights.json
+# JMX exporter
+COPY ./libs/jmx_prometheus_javaagent-0.16.1.jar /usr/share/prometheus/jmx_prometheus_javaagent-0.16.1.jar
+COPY ./configs/kafka-connect.yml /usr/share/prometheus/kafka-connect.yml

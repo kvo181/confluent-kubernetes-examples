@@ -3,10 +3,312 @@
 # The Kafka cluster ID that the worker is connected to
 GET http://localhost:8084
 ###
+GET http://localhost:8085
+###
 # Connectors
 # https://docs.confluent.io/platform/current/connect/references/restapi.html#connectors
 # Get a list of active connectors.
 GET http://localhost:8084/connectors
+###
+GET http://localhost:8085/connectors
+###
+GET http://172.18.3.83:8085/connectors
+###
+# Create a new connector, returning the current connector info if successful. 
+# Return 409 (Conflict) if rebalance is in process, or if the connector already exists.
+# SABAM DEV
+POST http://localhost:8085/connectors
+Content-Type: application/json
+Accept: application/json
+
+{ 
+  "name": "source-storageblob-unifiedpost", 
+  "config": {
+    "name": "source-storageblob-unifiedpost",
+    "connector.class": "io.confluent.connect.azure.blob.storage.AzureBlobStorageSourceConnector",
+    "azblob.account.name": "sasdmscommondev",
+    "azblob.account.key": "/g+pLANCARJhcMIH3PyRNPAikUPDuRx1RD9u5cZ/22mnGqWH4LVpSfhQx2x/gXho9eslsuWRCoMMmNB2v3NExQ==",
+    "azblob.container.name": "blob-to-kafka",
+    "azblob.poll.interval.ms": "300000",
+    "errors.tolerance": "none",
+    "errors.log.include.messages": "true",
+    "errors.log.enable": "true",
+    "errors.retry.timeout": "0",
+    "errors.retry.delay.max.ms": "60000",
+    "confluent.topic.bootstrap.servers": "pkc-lq8gm.westeurope.azure.confluent.cloud:9092",
+    "confluent.topic.retry.backoff.ms": "500",
+    "confluent.topic.ssl.endpoint.identification.algorithm": "https",
+    "confluent.topic.security.protocol": "SASL_SSL",
+    "confluent.topic.sasl.mechanism": "PLAIN",
+    "confluent.topic.sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"H36PXPZVDJA67ZUC\" password=\"5MvMJ3QW1/fHG9Pduhof5ll6Js3UmUHDRTlAXWZewoHuMCRmvSxs+l53R5SEZy//\";",
+    "confluent.topic.request.timeout.ms": "20000",
+    "topic.creation.default.partitions": "-1",
+    "topic.creation.default.replication.factor": "-1",
+    "schema.compatibility": "NONE",
+    "tasks.max": "1",
+    "format.class": "io.confluent.connect.azure.blob.storage.format.json.JsonFormat"
+  }
+}
+###
+# Create a new connector, returning the current connector info if successful. 
+# Return 409 (Conflict) if rebalance is in process, or if the connector already exists.
+# SABAM ACC
+POST http://localhost:8085/connectors
+Content-Type: application/json
+Accept: application/json
+
+{ 
+  "name": "source-storageblob-unifiedpost", 
+  "config": {
+    "name": "source-storageblob-unifiedpost",
+    "connector.class": "io.confluent.connect.azure.blob.storage.AzureBlobStorageSourceConnector",
+    "azblob.account.name": "sasdmscommonacc",
+    "azblob.account.key": "quLfq+Y8La+cd9ugdJkyC26i77O2PbqJRbth0rqfrsjBVU8DKCSIOHGmR3TsHW8RLGxs8lQB5+IoZzTP+1VnTw==",
+    "azblob.container.name": "blob-to-kafka",
+    "azblob.poll.interval.ms": "300000",
+    "errors.tolerance": "none",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "errors.retry.timeout": "0",
+    "errors.retry.delay.max.ms": "60000",
+    "confluent.topic.bootstrap.servers": "pkc-lq8gm.westeurope.azure.confluent.cloud:9092",
+    "confluent.topic.ssl.endpoint.identification.algorithm": "https",
+    "confluent.topic.security.protocol": "SASL_SSL",
+    "confluent.topic.sasl.mechanism": "PLAIN",
+    "confluent.topic.sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"KMGT44VWLS2QDYMC\" password=\"xNtwXvC9JH2Xk1u1buQKt0E/7Zh3An0gzESSTRzvrog0IEmq9q+MZGHxiRrWoZ0Z\";",
+    "confluent.topic.retry.backoff.ms": "500",
+    "confluent.topic.request.timeout.ms": "20000",
+    "topic.creation.default.partitions": "-1",
+    "topic.creation.default.replication.factor": "-1",
+    "schema.compatibility": "NONE",
+    "tasks.max": "1",
+    "format.class": "io.confluent.connect.azure.blob.storage.format.json.JsonFormat"
+  }
+}
+###
+# Delete the connector.
+DELETE http://localhost:8085/connectors/source-storageblob-unifiedpost
+###
+
+###
+# Get current status of the connector, including whether it is running, failed or paused, which worker it is assigned to, error information if it has failed, and the state of all its tasks.
+GET http://localhost:8085/connectors/source-storageblob-ice/status
+###
+# Get current status of the connector, including whether it is running, failed or paused, which worker it is assigned to, error information if it has failed, and the state of all its tasks.
+GET http://localhost:8085/connectors/source-jms-repar-names/status
+###
+# Get current status of the connector, including whether it is running, failed or paused, which worker it is assigned to, error information if it has failed, and the state of all its tasks.
+GET http://localhost:8085/connectors/sink-jms-financial-transacts/status
+###
+# Get current status of the connector, including whether it is running, failed or paused, which worker it is assigned to, error information if it has failed, and the state of all its tasks.
+GET http://localhost:8085/connectors/sink-jms-of-ddr/status
+###
+# Get current status of the connector, including whether it is running, failed or paused, which worker it is assigned to, error information if it has failed, and the state of all its tasks.
+GET http://localhost:8085/connectors/sink-storageblob-unifiedpost/status
+###
+# Get current status of the connector, including whether it is running, failed or paused, which worker it is assigned to, error information if it has failed, and the state of all its tasks.
+GET http://localhost:8085/connectors/source-storageblob-unifiedpost/status
+###
+# Get current status of the connector, including whether it is running, failed or paused, which worker it is assigned to, error information if it has failed, and the state of all its tasks.
+GET http://localhost:8085/connectors/source-jms-repartitions/status
+###
+
+###
+GET http://localhost:8085/connectors/sink-jms-financial-transacts/config
+###
+GET http://localhost:8085/connectors/sink-jms-of-ddr/config
+###
+# Get information about the connector.
+GET http://localhost:8085/connectors/sink-storageblob-unifiedpost
+###
+# Get information about the connector.
+GET http://localhost:8085/connectors/source-storageblob-unifiedpost
+###
+# Delete the connector.
+DELETE http://localhost:8085/connectors/sink-storageblob-unifiedpost
+###
+# Delete the connector.
+DELETE http://localhost:8085/connectors/sink-jms-of-ddr
+###
+PUT http://localhost:8085/connectors/sink-jms-of-ddr/pause
+###
+PUT http://localhost:8085/connectors/sink-storageblob-unifiedpost/pause
+###
+PUT http://localhost:8085/connectors/source-storageblob-unifiedpost/pause
+###
+PUT http://localhost:8085/connectors/sink-storageblob-unifiedpost/resume
+###
+PUT http://localhost:8085/connectors/source-storageblob-unifiedpost/resume
+###
+# sink azure blob storage
+GET http://localhost:8085/connectors/sink-storageblob-unifiedpost/config
+###
+# source azure blob storage
+GET http://localhost:8085/connectors/source-storageblob-unifiedpost/config
+###
+# source jms
+GET http://localhost:8085/connectors/source-jms-repar-names/config
+###
+# Validate the provided configuration values against the configuration definition. 
+# This API performs per config validation, returns suggested values and error messages during validation.
+PUT http://localhost:8085/connector-plugins/AzureBlobStorageSourceConnector/config/validate
+Content-Type: application/json
+
+{
+  "connector.class": "io.confluent.connect.azure.blob.storage.AzureBlobStorageSourceConnector",
+  "errors.retry.timeout": "0",
+  "errors.retry.delay.max.ms": "60000",
+  "errors.log.include.messages": "true",
+  "errors.tolerance": "all",
+  "errors.log.enable": "true",
+  "schema.compatibility": "NONE",
+  "tasks.max": "1",
+  "confluent.topic.ssl.endpoint.identification.algorithm": "https",
+  "format.class": "io.confluent.connect.cloud.storage.source.format.CloudStorageJsonFormat",
+  "confluent.topic.security.protocol": "SASL_SSL",
+  "azblob.container.name": "blob-to-kafka",
+  "azblob.account.key": "/g+pLANCARJhcMIH3PyRNPAikUPDuRx1RD9u5cZ/22mnGqWH4LVpSfhQx2x/gXho9eslsuWRCoMMmNB2v3NExQ==",
+  "azblob.account.name": "sasdmscommondev",
+  "topic.creation.default.replication.factor": "-1",
+  "topic.creation.default.partitions"        : "-1",
+  "confluent.topic.sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"H36PXPZVDJA67ZUC\" password=\"5MvMJ3QW1/fHG9Pduhof5ll6Js3UmUHDRTlAXWZewoHuMCRmvSxs+l53R5SEZy//\";",
+  "name": "source-storageblob-unifiedpost",
+  "confluent.topic.retry.backoff.ms": "500",
+  "confluent.topic.bootstrap.servers": "pkc-lq8gm.westeurope.azure.confluent.cloud:9092",
+  "confluent.topic.sasl.mechanism": "PLAIN",
+  "confluent.topic.request.timeout.ms": "20000"
+}
+###
+# sink azure blob storage
+PUT http://localhost:8085/connectors/sink-storageblob-unifiedpost/config
+###
+# source azure blob storage
+PUT http://localhost:8085/connectors/source-storageblob-unifiedpost/config
+Content-Type: application/json
+
+{
+  "name": "source-storageblob-unifiedpost",
+  "connector.class": "io.confluent.connect.azure.blob.storage.AzureBlobStorageSourceConnector",
+  "tasks.max": "1",
+  "errors.retry.timeout": "0",
+  "errors.retry.delay.max.ms": "60000",
+  "errors.log.include.messages": "true",
+  "errors.tolerance": "none",
+  "errors.log.enable": "true",
+  "azblob.account.name": "sasdmscommondev",
+  "azblob.account.key": "/g+pLANCARJhcMIH3PyRNPAikUPDuRx1RD9u5cZ/22mnGqWH4LVpSfhQx2x/gXho9eslsuWRCoMMmNB2v3NExQ==",
+  "azblob.container.name": "blob-to-kafka",
+  "azblob.poll.interval.ms": 300000,
+  "format.class": "io.confluent.connect.azure.blob.storage.format.json.JsonFormat",
+  "schema.compatibility": "NONE",
+  "topic.creation.default.replication.factor": "-1",
+  "topic.creation.default.partitions"        : "-1",
+  "confluent.topic.ssl.endpoint.identification.algorithm": "https",
+  "confluent.topic.sasl.mechanism": "PLAIN",
+  "confluent.topic.security.protocol": "SASL_SSL",
+  "confluent.topic.bootstrap.servers": "pkc-lq8gm.westeurope.azure.confluent.cloud:9092",
+  "confluent.topic.sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"H36PXPZVDJA67ZUC\" password=\"5MvMJ3QW1/fHG9Pduhof5ll6Js3UmUHDRTlAXWZewoHuMCRmvSxs+l53R5SEZy//\";",
+  "confluent.topic.request.timeout.ms": "20000",
+  "confluent.topic.retry.backoff.ms": "500"
+}
+###
+# source azure blob storage
+PUT http://localhost:8085/connectors/source-storageblob-unifiedpost/config
+Content-Type: application/json
+
+{
+  "name": "source-storageblob-unifiedpost",
+  "connector.class": "io.confluent.connect.azure.blob.storage.AzureBlobStorageSourceConnector",
+  "errors.retry.timeout": "0",
+  "errors.log.include.messages": "true",
+  "errors.retry.delay.max.ms": "60000",
+  "errors.tolerance": "all",
+  "errors.log.enable": "true",
+  "schema.compatibility": "NONE",
+  "tasks.max": "1",
+  "format.class": "io.confluent.connect.cloud.storage.source.format.CloudStorageJsonFormat",
+  "azblob.container.name": "blob-to-kafka",
+  "azblob.account.key": "quLfq+Y8La+cd9ugdJkyC26i77O2PbqJRbth0rqfrsjBVU8DKCSIOHGmR3TsHW8RLGxs8lQB5+IoZzTP+1VnTw==",
+  "azblob.account.name": "sasdmscommonacc",
+  "topic.creation.default.replication.factor": -1,
+  "topic.creation.default.partitions"        : -1,
+  "confluent.topic.retry.backoff.ms": "500",
+  "confluent.topic.bootstrap.servers": "pkc-lq8gm.westeurope.azure.confluent.cloud:9092",
+  "confluent.topic.ssl.endpoint.identification.algorithm": "https",
+  "confluent.topic.security.protocol": "SASL_SSL",
+  "confluent.topic.sasl.mechanism": "PLAIN",
+  "confluent.topic.sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"KMGT44VWLS2QDYMC\" password=\"xNtwXvC9JH2Xk1u1buQKt0E/7Zh3An0gzESSTRzvrog0IEmq9q+MZGHxiRrWoZ0Z\";",
+  "confluent.topic.request.timeout.ms": "20000"
+}
+###
+# source jms
+PUT http://localhost:8085/connectors/source-jms-repar-names/config
+Content-Type: application/json
+
+{
+  "name": "source-jms-repar-names",
+  "connector.class": "io.confluent.connect.jms.JmsSourceConnector",
+  "tasks.max": "1",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "transforms": "ReplaceField,ValueToKey,ExtractFieldValue,ExtractFieldKey",
+  "transforms.ReplaceField.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+  "transforms.ReplaceField.whitelist": "type,text",
+  "transforms.ValueToKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
+  "transforms.ValueToKey.fields": "type",
+  "transforms.ExtractFieldValue.type": "org.apache.kafka.connect.transforms.ExtractField$Value",
+  "transforms.ExtractFieldValue.field": "text",
+  "transforms.ExtractFieldKey.field": "type",
+  "transforms.ExtractFieldKey.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+  "errors.retry.timeout": "0",
+  "errors.retry.delay.max.ms": "60000",
+  "errors.tolerance": "none",
+  "errors.log.enable": "true",
+  "errors.log.include.messages": "true",
+  "java.naming.provider.url": "jdbc:oracle:thin:@10.10.1.13:1521:SISDEV",
+  "java.naming.factory.initial": "oracle.jms.AQjmsInitialContextFactory",
+  "connection.factory.name": "ConnectionFactory",
+  "java.naming.security.principal": "SDMS_IP_CONN",
+  "java.naming.security.credentials": "a8Etec6NbRMe9HTc",
+  "jms.destination.name": "SDMS.SIS2SDMS_REPAR_NAMES_JMS_Q",
+  "jms.destination.type": "QUEUE",
+  "max.poll.duration": "10000",
+  "max.retry.time": "0",
+  "kafka.topic": "redi-repartition-names",
+  "confluent.topic.bootstrap.servers": "pkc-lq8gm.westeurope.azure.confluent.cloud:9092",
+  "db_url": "jdbc:oracle:thin:@10.10.1.13:1521:SISDEV",
+  "plugin.path": "/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms/lib,/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms,/usr/share/confluent-hub-components",
+  "rest.port": "8085",
+  "topic.creation.default.partitions": "-1",
+  "topic.creation.default.replication.factor": "-1",
+  "confluent.topic.security.protocol": "SASL_SSL",
+  "confluent.topic.ssl.endpoint.identification.algorithm": "https",
+  "confluent.topic.sasl.mechanism": "PLAIN",
+  "confluent.topic.sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"H36PXPZVDJA67ZUC\" password=\"5MvMJ3QW1/fHG9Pduhof5ll6Js3UmUHDRTlAXWZewoHuMCRmvSxs+l53R5SEZy//\";",
+  "confluent.topic.retry.backoff.ms": "500",
+  "confluent.topic.request.timeout.ms": "20000"
+}
+
+###
+GET http://localhost:8085/connectors/sink-storageblob-unifiedpost/tasks/0/status
+###
+POST http://localhost:8085/connectors/sink-storageblob-unifiedpost/tasks/0/restart
+###
+GET http://localhost:8085/connectors/source-storageblob-unifiedpost/tasks/0/status
+###
+POST http://localhost:8085/connectors/source-storageblob-unifiedpost/tasks/0/restart
+###
+POST http://localhost:8085/connectors/source-storageblob-ice/tasks/0/restart
+###
+GET http://localhost:8085/connectors/source-jms-repar-names/tasks/0/status
+###
+POST http://localhost:8085/connectors/source-jms-repar-names/tasks/0/restart
+###
+GET http://localhost:8085/connectors/source-jms-repartitions/tasks/0/status
+###
+POST http://localhost:8085/connectors/source-jms-repartitions/tasks/0/restart
+###
+POST http://localhost:8085/connectors/sink-jms-financial-transacts/tasks/0/restart
 ###
 # Create a new connector, returning the current connector info if successful. 
 # Return 409 (Conflict) if rebalance is in process, or if the connector already exists.
@@ -47,7 +349,7 @@ Accept: application/json
     "plugin.path": "/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms/lib,/usr/share/confluent-hub-components/confluentinc-kafka-connect-jms,/usr/share/confluent-hub-components",
     "rest.port": "8085"
    }
- }
+}
 ###
 # Create a new connector, returning the current connector info if successful. 
 # Return 409 (Conflict) if rebalance is in process, or if the connector already exists.
@@ -161,15 +463,114 @@ Accept: application/json
     "confluent.topic.replication.factor": 1,
     "db_url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE"
    }
- }
+}
+###
+# Delete the connector.
+DELETE http://localhost:8084/connectors/AzureBlobStorageSourceConnectorConnector_1
+###
+# Create a new connector, returning the current connector info if successful. 
+# Return 409 (Conflict) if rebalance is in process, or if the connector already exists.
+POST http://localhost:8084/connectors
+Content-Type: application/json
+Accept: application/json
+
+{
+   "name": "AzureBlobStorageSourceConnectorConnector_1",
+   "config": {
+      "name": "AzureBlobStorageSourceConnectorConnector_1",
+      "connector.class": "io.confluent.connect.azure.blob.storage.AzureBlobStorageSourceConnector",
+      "tasks.max": "1",
+      "errors.tolerance": "none",
+      "errors.log.enable": "true",
+      "errors.log.include.messages": "true",
+      "behavior.on.error": "fail",
+      "azblob.account.name": "devstoreaccount1",
+      "azblob.account.key": "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==",
+      "azblob.container.name": "blob-to-kafka",
+      "azblob.poll.interval.ms": 20000,
+      "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+      "confluent.topic.replication.factor": "-1",
+      "format.class": "io.confluent.connect.cloud.storage.source.format.CloudStorageJsonFormat",
+      "schema.compatibility": "NONE"
+   }
+}
+###
+# Delete the connector.
+DELETE http://localhost:8084/connectors/AzureBlobStorageSourceConnectorConnector_0
+###
+# Create a new connector, returning the current connector info if successful. 
+# Return 409 (Conflict) if rebalance is in process, or if the connector already exists.
+POST http://localhost:8084/connectors
+Content-Type: application/json
+Accept: application/json
+
+{
+   "name": "AzureBlobStorageSourceConnectorConnector_0",
+   "config": {
+      "name": "AzureBlobStorageSourceConnectorConnector_0",
+      "connector.class": "io.confluent.connect.azure.blob.storage.AzureBlobStorageSourceConnector",
+      "tasks.max": "1",
+      //"value.converter": "org.apache.kafka.connect.json.JsonConverter",
+      "errors.tolerance": "none",
+      "errors.log.enable": "true",
+      "errors.log.include.messages": "true",
+      "topics.dir": "output",
+      "behavior.on.error": "fail",
+      "format.class": "io.confluent.connect.azure.blob.storage.format.json.JsonFormat",
+      "azblob.account.name": "storflatfile4711",
+      "azblob.account.key": "iv+8Vj/3qgjS633OPj7ZT5qHrw7AGfbnGWbPS7VZQ6K+4EZY56ZmlrIT/TIVy2aOxLHP50utm+OT6nRyP7rj0g==",
+      "azblob.container.name": "topics",
+      "azblob.poll.interval.ms": 10000,
+      "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+      "confluent.topic.replication.factor": "-1",
+      "topic.creation.default.partitions": "-1",
+      "topic.creation.default.replication.factor": "-1",
+      "schema.compatibility": "NONE"
+   }
+}
+###
+# Create a new connector, returning the current connector info if successful. 
+# Return 409 (Conflict) if rebalance is in process, or if the connector already exists.
+POST http://localhost:8084/connectors
+Content-Type: application/json
+Accept: application/json
+
+{
+   "name": "AzureBlobStorageSinkConnectorConnector_0",
+   "config": {
+      "name": "AzureBlobStorageSinkConnectorConnector_0",
+      "connector.class": "io.confluent.connect.azure.blob.AzureBlobStorageSinkConnector",
+      "tasks.max": 1,
+      "errors.retry.timeout": 0,
+      "errors.retry.delay.max.ms": 60000,
+      "errors.tolerance": "none",
+      "errors.log.enable": "true",
+      "errors.log.include.messages": "true",
+      "topics": "test_blob_array",
+      "topics.dir": "output",
+      "flush.size": "1",
+      "azblob.account.name": "storflatfile4711",
+      "azblob.account.key": "iv+8Vj/3qgjS633OPj7ZT5qHrw7AGfbnGWbPS7VZQ6K+4EZY56ZmlrIT/TIVy2aOxLHP50utm+OT6nRyP7rj0g==",
+      "azblob.container.name": "topics",
+      "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+      "confluent.topic.replication.factor": "-1",
+      "format.class": "io.confluent.connect.azure.storage.format.json.JsonFormat",
+      "schema.compatibility": "NONE"
+      // "storage.class": "io.confluent.connect.azure.blob.storage.AzureBlobStorage"
+  }
+}
 ###
 # Get information about the connector.
+GET http://localhost:8084/connectors/jms-source-connector
+###
 GET http://localhost:8084/connectors/jms-source-connector
 ###
 # Get the configuration for the connector.
 GET http://localhost:8084/connectors/jms-source-connector/config
 ###
-GET http://localhost:8084/connectors/jms-sink-connector/config
+GET http://localhost:8084/connectors/AzureBlobStorageSinkConnectorConnector_0/config
+###
+GET http://localhost:8084/connectors/AzureBlobStorageSourceConnectorConnector_1/config
 ###
 # Update the configuration
 # jms source using avro
@@ -355,14 +756,111 @@ Content-Type: application/json
     "db_url": "jdbc:oracle:thin:@oracle-service.oracle.svc.cluster.local:1521/XE"
 }
 ###
+# jms sink azure blob storage
+PUT http://localhost:8084/connectors/AzureBlobStorageSinkConnectorConnector_0/config
+Content-Type: application/json
+
+{
+  "name": "AzureBlobStorageSinkConnectorConnector_0",
+  "connector.class": "io.confluent.connect.azure.blob.AzureBlobStorageSinkConnector",
+  "tasks.max": 1,
+  "errors.retry.timeout": 0,
+  "errors.retry.delay.max.ms": 60000,
+  "errors.tolerance": "none",
+  "errors.log.enable": "true",
+  "errors.log.include.messages": "true",
+  "topics": "test_blob_array",
+  "topics.dir": "test",
+  "flush.size": "1",
+  "azblob.account.name": "storflatfile4711",
+  "azblob.account.key": "iv+8Vj/3qgjS633OPj7ZT5qHrw7AGfbnGWbPS7VZQ6K+4EZY56ZmlrIT/TIVy2aOxLHP50utm+OT6nRyP7rj0g==",
+  "azblob.container.name": "topics",
+  "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+  "confluent.topic.replication.factor": "-1",
+  "format.class": "io.confluent.connect.azure.storage.format.json.JsonFormat",
+  "schema.compatibility": "NONE"
+  // "storage.class": "io.confluent.connect.azure.blob.storage.AzureBlobStorage"
+}
+###
+# source azure blob storage
+PUT http://localhost:8084/connectors/AzureBlobStorageSourceConnectorConnector_0/config
+Content-Type: application/json
+
+{
+  "name": "AzureBlobStorageSourceConnectorConnector_0",
+  "connector.class": "io.confluent.connect.azure.blob.storage.AzureBlobStorageSourceConnector",
+  "tasks.max": "1",
+  "errors.tolerance": "all",
+  "errors.log.enable": "true",
+  "errors.log.include.messages": "true",
+  "topics.dir": "output",
+  "behavior.on.error": "fail",
+  // "topics": "test_blob_output",
+  // "transforms": "AddPrefix",
+  // "transforms.AddPrefix.type": "org.apache.kafka.connect.transforms.RegexRouter",
+  // "transforms.AddPrefix.regex": ".*",
+  // "transforms.AddPrefix.replacement": "copy_of_$0",
+  "format.class": "io.confluent.connect.azure.blob.storage.format.json.JsonFormat",
+  "azblob.account.name": "storflatfile4711",
+  "azblob.account.key": "iv+8Vj/3qgjS633OPj7ZT5qHrw7AGfbnGWbPS7VZQ6K+4EZY56ZmlrIT/TIVy2aOxLHP50utm+OT6nRyP7rj0g==",
+  "azblob.container.name": "topics",
+  "azblob.poll.interval.ms": 10000,
+  "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+  "confluent.topic.replication.factor": "-1",
+  "topic.creation.default.partitions": "-1",
+  "topic.creation.default.replication.factor": "-1",
+  //"format.class": "io.confluent.connect.cloud.storage.source.format.CloudStorageJsonFormat",
+  "schema.compatibility": "NONE"
+}
+###
+# source azure blob storage
+PUT http://localhost:8084/connectors/AzureBlobStorageSourceConnectorConnector_1/config
+Content-Type: application/json
+
+{
+  "name": "AzureBlobStorageSourceConnectorConnector_1",
+  "connector.class": "io.confluent.connect.azure.blob.storage.AzureBlobStorageSourceConnector",
+  "tasks.max": "1",
+  "errors.tolerance": "none",
+  "errors.log.enable": "true",
+  "errors.log.include.messages": "true",
+  "behavior.on.error": "fail",
+  "azblob.account.name": "devstoreaccount1",
+  "azblob.account.key": "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==",
+  "azblob.container.name": "blob-to-kafka",
+  "azblob.poll.interval.ms": 20000,
+  "confluent.topic.bootstrap.servers": "kafka.confluent.svc.cluster.local:9071",
+  "confluent.topic.replication.factor": "-1",
+  "format.class": "io.confluent.connect.cloud.storage.source.format.CloudStorageJsonFormat",
+  "schema.compatibility": "NONE"
+}
+###
 # Get current status of the connector, including whether it is running, failed or paused, which worker it is assigned to, error information if it has failed, and the state of all its tasks.
 GET http://localhost:8084/connectors/jms-source-connector/status
+###
+GET http://localhost:8084/connectors/AzureBlobStorageSourceConnectorConnector_0/status
+###
+GET http://localhost:8084/connectors/AzureBlobStorageSourceConnectorConnector_1/status
+###
+PUT http://localhost:8084/connectors/AzureBlobStorageSourceConnectorConnector_0/pause
+###
+PUT http://localhost:8084/connectors/AzureBlobStorageSourceConnectorConnector_0/resume
+###
+GET http://localhost:8084/connectors/AzureBlobStorageSinkConnectorConnector_0/status
+###
+PUT http://localhost:8084/connectors/AzureBlobStorageSinkConnectorConnector_0/pause
+###
+PUT http://localhost:8084/connectors/AzureBlobStorageSinkConnectorConnector_0/resume
 ###
 GET http://localhost:8084/connectors/jms-sink-connector/status
 ###
 # Pause the connector and its tasks, which stops message processing until the connector is resumed. 
 # This call asynchronous and the tasks will not transition to PAUSED state at the same time.
 PUT http://localhost:8084/connectors/jms-source-connector/pause
+###
+GET http://localhost:8084/connectors/AzureBlobStorageSourceConnectorConnector_0/tasks/0/status
+###
+POST http://localhost:8084/connectors/AzureBlobStorageSourceConnectorConnector_0/tasks/0/restart
 ###
 # Resume a paused connector or do nothing if the connector is not paused. 
 # This call asynchronous and the tasks will not transition to RUNNING state at the same time.
@@ -378,7 +876,7 @@ GET http://localhost:8084/connectors/jms-source-connector/tasks/0/status
 GET http://localhost:8084/connectors/jms-sink-connector/tasks/0/status
 ###
 # Restart a task
-POST http://localhost:8084/connectors/jms-source-connector/tasks/0/restart
+POST http://localhost:8084/connectors/AzureBlobStorageSinkConnectorConnector_0/tasks/0/restart
 ###
 POST http://localhost:8084/connectors/jms-sink-connector/tasks/0/restart
 ###
@@ -392,7 +890,7 @@ GET http://localhost:8084/connectors/jms-sink-connector/topics
 ###
 # Connector Plugins
 # Return a list of connector plugins installed in the Kafka Connect cluster.
-GET http://localhost:8084/connector-plugins
+GET http://localhost:8083/connector-plugins
 ###
 # Validate the provided configuration values against the configuration definition. 
 # This API performs per config validation, returns suggested values and error messages during validation.
@@ -563,3 +1061,24 @@ Content-Type: application/vnd.ksql.v1+json
     "sql":"SELECT MSG_CT FROM MSG_COUNT WHERE X='X';"
 }
 
+###
+GET http://localhost:8083/admin/loggers
+###
+GET http://localhost:8085/admin/loggers/org.apache.kafka.connect.runtime.WorkerSourceTask
+###
+GET http://localhost:8085/admin/loggers/io.confluent.connect.azure.blob.storage.AzureBlobStorageSourceConnector
+###
+GET http://localhost:8085/admin/loggers/org.apache.kafka.connect.json.JsonConverterConfig
+###
+PUT http://localhost:8085/admin/loggers/org.apache.kafka.connect.json.JsonConverterConfig
+Content-Type: application/json
+
+{ "level": "WARN" }
+###
+PUT http://localhost:8085/admin/loggers/io.confluent.connect.cloud.storage.source.StorageSourceTask
+Content-Type: application/json
+
+{ "level": "WARN" }
+
+###
+GET http://localhost:8093/metrics

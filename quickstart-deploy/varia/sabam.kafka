@@ -1,0 +1,3 @@
+CONSUMER kc-connectors
+topic: kc-offset
+from: 0

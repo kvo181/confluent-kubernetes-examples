@@ -25,6 +25,175 @@ key: mykeyq
 {{random.words}}
 
 ###
-
+PRODUCER keyed-message
+topic: blob_input
+{ 
+    "input_record":
+    {
+        "test": "value"
+    }
+}
+###
+PRODUCER keyed-message
+topic: test_blob_input
+{ 
+    "print_record":
+    {
+        "header": {
+            "id": "{{random.uuid}}",
+            "fileoffset": 15,
+            "reason": "up test 013",
+            "filepath": "/pdf/toprint/Invoice_1.pdf"
+        },
+        "details": [
+            {
+                "line": 1,
+                "value": "test 1"
+            },
+            {
+                "line": 2,
+                "value": "test 2"
+            }
+        ],
+        "footer": {
+            "lineCount": 2
+        }
+    }
+}
+###
+PRODUCER keyed-message
+topic: test_blob_array
+{\"unifiedPostResult\":{\"batchId\":\"c8d299c5-7ae3-400f-bd45-b020922a954b\",\"pipelineResult\":{\"error:\":\"\"},\"results\":[{\"documentId\":\"Betalingsdocument_1947766_88dfc194bd52_25102021.pdf\",\"error:\":\"\"}]}}
 
 ###
+{ 
+    "UnifiedPost":
+    {
+        "fileoffset": 3,
+        "id": "{{random.uuid}}",
+        "documents": [
+            {
+                "document":
+                {
+                    "header": {
+                        "id": "{{random.uuid}}",
+                        "reason": "up test 001",
+                        "filepath": "/pdf/toprint/Invoice_1.pdf"
+                    },
+                    "details": [
+                        {
+                            "line": 1,
+                            "value": "test 1"
+                        },
+                        {
+                            "line": 2,
+                            "value": "test 2"
+                        }
+                    ],
+                    "footer": {
+                        "lineCount": 2
+                    }
+                }
+            },
+            {
+                "document":
+                {
+                    "header": {
+                        "id": "{{random.uuid}}",
+                        "reason": "up test 002",
+                        "filepath": "/pdf/toprint/Invoice_2.pdf"
+                    },
+                    "details": [
+                        {
+                            "line": 1,
+                            "value": "test 1"
+                        },
+                        {
+                            "line": 2,
+                            "value": "test 2"
+                        }
+                    ],
+                    "footer": {
+                        "lineCount": 2
+                    }
+                }
+            },
+            {
+                "document":
+                {
+                    "header": {
+                        "id": "{{random.uuid}}",
+                        "reason": "up test 003",
+                        "filepath": "/pdf/toprint/Invoice_3.pdf"
+                    },
+                    "details": [
+                        {
+                            "line": 1,
+                            "value": "test 1"
+                        },
+                        {
+                            "line": 2,
+                            "value": "test 2"
+                        }
+                    ],
+                    "footer": {
+                        "lineCount": 2
+                    }
+                }
+            },
+            {
+                "document":
+                {
+                    "header": {
+                        "id": "{{random.uuid}}",
+                        "reason": "up test 004",
+                        "filepath": "/pdf/toprint/Invoice_4.pdf"
+                    },
+                    "details": [
+                        {
+                            "line": 1,
+                            "value": "test 1"
+                        },
+                        {
+                            "line": 2,
+                            "value": "test 2"
+                        }
+                    ],
+                    "footer": {
+                        "lineCount": 2
+                    }
+                }
+            }
+        ]
+    }
+}
+###
+PRODUCER keyed-message
+topic: topic_name
+key: mykeyq
+{{random.words}}
+
+###
+CONSUMER consumer-group-id
+topic: copy_of_test_blob_input
+from: 10
+
+###
+CONSUMER consumer-group-id-1
+topic: test_blob_array
+from: 0
+
+###
+CONSUMER consumer-group-id-2
+topic: jms-adapter-offset
+from: 0
+
+PRODUCER keyed-message
+topic: test_blob_array
+key: {{random.uuid}}
+{ "test": "{{random.words}}"" }
+
+###
+CONSUMER consumer-group-kvo
+topic: common-unified-post-response
+from: 0
